@@ -26,15 +26,15 @@ from utilis.snp_generator import inject_snps, save_sample, save_snp_log
 from utilis.reads_generator import generate_reads, save_reads
 
 BASE = os.path.dirname(__file__)
-CHR1 = os.path.join(BASE, 'data/ch1/chr1_no_n.festa')
+CHR1 = os.path.join(BASE, 'data/ch1/chr1_chunk.festa')
 
 L    = 100
 SEED = 1212
 
 DATASETS = [
-    {'n': 200_000,   'label': '200K',  'start': 200_000},
-    {'n': 600_000,   'label': '600K',  'start': 200_000},
-    {'n': 1_800_000, 'label': '1800K', 'start': 200_000},
+    {'n': 200_000,   'label': '200K',  'start': 0},
+    {'n': 600_000,   'label': '600K',  'start': 0},
+    {'n': 1_800_000, 'label': '1800K', 'start': 0},
 ]
 
 SNP_RATES = [
