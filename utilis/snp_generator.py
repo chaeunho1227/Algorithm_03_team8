@@ -3,8 +3,6 @@ import os
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from utilis.extract_region import load_genome_raw
-
 
 def inject_snps(genome: str, snp_rate: float, seed: int = None) -> tuple[str, list[tuple[int, str, str]]]:
     if seed is not None:

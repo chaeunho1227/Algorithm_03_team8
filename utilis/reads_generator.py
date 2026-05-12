@@ -3,9 +3,6 @@ import os
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from utilis.extract_region import load_genome_raw
-
-
 def generate_reads(genome: str, m: int, l: int, seed: int = None) -> list[tuple[int, str]]:
     if seed is not None:
         random.seed(seed)
