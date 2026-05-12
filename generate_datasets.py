@@ -7,16 +7,6 @@
   M: N/10 (10x coverage), N/5 (20x coverage)
   D: 3
   변이율: 1%, 3%, 5%
-
-구조:
-data/
-└── {size}/
-    ├── reference_{size}.festa
-    └── snp_{rate}/
-        ├── sample.festa
-        ├── snp.tsv
-        ├── reads_{M_10x}.txt
-        └── reads_{M_20x}.txt
 """
 import os
 import sys
