@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from utilis.snp_generator import inject_snps, save_sample, save_snp_log
-from utilis.reads_generator import generate_reads, save_reads
+from utilis.reads_generator import generate_reads, save_reads, save_truth
 
 BASE = os.path.dirname(__file__)
 CHR1 = os.path.join(BASE, 'data/ch1/chr1_chunk.festa')
@@ -90,10 +90,12 @@ def main():
             # reads 생성 (10x, 20x)
             for coverage, m in [(10, n // L * 10), (20, n // L * 20)]:
                 reads_path = os.path.join(snp_dir, f'reads_{m}.txt')
+                truth_path = os.path.join(snp_dir, f'truth_{m}.tsv')
                 if not os.path.exists(reads_path):
                     print(f'    [reads_{m}] Generating {m:,} reads (L={L}, {coverage}x)...')
                     reads = generate_reads(sample, m=m, l=L, seed=SEED)
                     save_reads(reads, reads_path)
+                    save_truth(reads, truth_path)
                 else:
                     print(f'    [reads_{m}] Already exists, skipping.')
 
