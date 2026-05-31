@@ -1,5 +1,10 @@
-from .utils import count_mismatches
-from .index_builder import hash_kmer
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from src.eunho.utils import count_mismatches
+from src.eunho.index_builder import hash_kmer
 
 
 def map_read(read, genome, index, k, max_mismatches):

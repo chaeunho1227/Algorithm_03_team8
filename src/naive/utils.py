@@ -3,7 +3,7 @@ def parse_fasta(path):
     current_name = None
     current_seqs = []
 
-    with open(path) as f:
+    with open(path, "rt") as f:
         for line in f:
             line = line.rstrip()
             if not line:
@@ -21,22 +21,28 @@ def parse_fasta(path):
     return sequences
 
 
-def stream_reads(path):
-    with open(path) as f:
+def load_reads(path):
+    """최적화 없는 reads 로드.
+
+    제거된 최적화:
+        - stream 방식 제거: 파일 전체를 메모리에 한 번에 로드
+    """
+    reads = []
+    with open(path, "rt") as f:
         for idx, line in enumerate(f):
             seq = line.rstrip().upper()
             if seq:
-                yield f"read_{idx:06d}", seq
+                reads.append((f"read_{idx:06d}", seq))
+    return reads
 
 
-def count_mismatches(s1, s2, max_d):
-    mm = 0
-    for a, b in zip(s1, s2):
-        if a != b:
-            mm += 1
-            if mm > max_d:
-                return mm
-    return mm
+def count_mismatches(s1, s2):
+    """최적화 없는 mismatch 계산.
+
+    제거된 최적화:
+        - 조기 종료 제거: mismatch 수와 무관하게 끝까지 비교
+    """
+    return sum(a != b for a, b in zip(s1, s2))
 
 
 def write_tsv(hits_list, path):

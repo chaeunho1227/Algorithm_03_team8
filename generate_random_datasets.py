@@ -1,11 +1,12 @@
 import os
 import sys
+import random
 sys.path.insert(0, os.path.dirname(__file__))
 
 from utilis.snp_generator import inject_snps, save_sample
 from utilis.reads_generator import generate_reads, save_reads, save_truth
 
-CHR1 = os.path.join(os.path.dirname(__file__), 'data/ch1/chr1_chunk.festa')
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data', 'random')
 
 L    = 100
 SEED = 1212
@@ -42,18 +43,19 @@ def save_reference(genome, path, header):
 
 
 def main():
-    chr1 = load_genome(CHR1)
+    random.seed(SEED)
 
     for ds in DATASETS:
         n, label = ds['n'], ds['label']
-        ds_dir   = os.path.join(os.path.dirname(__file__), f'data/{label}')
+        ds_dir   = os.path.join(DATA_DIR, label)
         ref_path = os.path.join(ds_dir, f'reference_{label}.festa')
 
         if not os.path.exists(ref_path):
-            print(f'\n[{label}] Extracting reference...')
-            save_reference(chr1[:n], ref_path, header=f'reference_{label}')
+            print(f'\n[random/{label}] Generating random reference ({n:,} bp)...')
+            genome = ''.join(random.choices('ACGT', k=n))
+            save_reference(genome, ref_path, header=f'reference_random_{label}')
         else:
-            print(f'\n[{label}] Reference already exists, skipping.')
+            print(f'\n[random/{label}] Reference already exists, skipping.')
 
         reference = load_genome(ref_path)
 
@@ -80,7 +82,7 @@ def main():
                 else:
                     print(f'    [reads_{m}] Already exists, skipping.')
 
-    print('\nAll datasets ready.')
+    print('\nAll random datasets ready.')
 
 
 if __name__ == '__main__':

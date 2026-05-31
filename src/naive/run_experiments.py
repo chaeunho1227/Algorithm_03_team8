@@ -4,11 +4,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from src.eunho.main import run_mapping
+from src.naive.main import run_mapping
 from src.eunho.evaluate import load_truth, load_result, evaluate
 
-# ==============================================================
-#  실험 설정 — 이 블록만 수정하면 됩니다
 # ==============================================================
 
 # 테스트할 genome 크기 (200_000 / 600_000 / 1_800_000)
@@ -19,9 +17,6 @@ COVERAGES = [10, 20]
 
 # 테스트할 SNP rate (0.01 / 0.03 / 0.05)
 SNP_RATES = [0.01, 0.03, 0.05]
-
-# 반복 서열 필터 임계값 (0 = 필터 없음)
-MAX_REPEAT = 500
 
 # 테스트할 데이터셋
 # data_dir:    reads/reference 파일 위치
@@ -69,7 +64,7 @@ def run_dataset(data_dir, results_dir, tag):
                     continue
 
                 t0 = time.time()
-                run_mapping(ref_path, reads_path, result_path, max_repeat=MAX_REPEAT)
+                run_mapping(ref_path, reads_path, result_path)
                 elapsed = time.time() - t0
 
                 mapped, total = 0, 0
