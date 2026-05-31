@@ -5,13 +5,10 @@ PATTERN = re.compile(r"^(200K|600K|1800K)_(snp_[135])(?:_d\d+)?_cov(\d+)x$")
 
 def analyze(results_dir):
     data_dir = "data/random" if "random" in results_dir else "data"
+    tag = "random" if "random" in results_dir else "chr1"
 
-    print(f"\n{'='*68}\n  {results_dir}\n{'='*68}")
-    print(f"{'Config':<32} {'Align':>7} {'Prec':>7} {'Recall':>7}")
-    print("-" * 55)
-
-    rows = []
-    for subdir in sorted(os.listdir(results_dir)):
+    entries = []
+    for subdir in os.listdir(results_dir):
         m = PATTERN.match(subdir)
         result_path = os.path.join(results_dir, subdir, "result.tsv")
         if not m or not os.path.exists(result_path):
@@ -44,16 +41,27 @@ def analyze(results_dir):
                     p = line.rstrip().split("\t")
                     if p[1] != "*" and truth.get(p[0]) == int(p[2]):
                         correct += 1
-            prec = f"{correct/mapped*100:.1f}" if mapped else "N/A"
-            rec  = f"{correct/len(truth)*100:.1f}"
+            prec = f"{correct/mapped*100:.1f}%" if mapped else "N/A"
+            rec  = f"{correct/len(truth)*100:.1f}%"
 
-        align = f"{mapped/total*100:.1f}"
-        print(f"{subdir:<32} {align:>6}% {prec+('%' if prec != 'N/A' else ''):>7} {rec+('%' if rec != 'N/A' else ''):>7}")
-        rows.append((subdir, align, prec, rec))
+        snp_num = int(snp.split("_")[1])
+        entries.append((SIZE_BP[size], snp_num, cov, tag, size, f"{snp_num}%", f"{cov}x",
+                        f"{mapped/total*100:.1f}%", prec, rec))
+
+    entries.sort(key=lambda x: (x[0], x[1], x[2]))
+
+    print(f"\n{'='*78}")
+    print(f"{'태그':>8} {'N':>6} {'SNP':>5} {'Coverage':>8} {'정렬률':>8} {'정밀도':>8} {'재현율':>8}")
+    print("-" * 78)
+
+    rows = []
+    for _, _, _, t, size, snp_pct, cov_lbl, align, prec, rec in entries:
+        print(f"{t:>8} {size:>6} {snp_pct:>5} {cov_lbl:>8} {align:>8} {prec:>8} {rec:>8}")
+        rows.append((t, size, snp_pct, cov_lbl, align, prec, rec))
 
     summary_path = os.path.join(results_dir, "summary.tsv")
     with open(summary_path, "w") as f:
-        f.write("Config\tAlignRate\tPrecision\tRecall\n")
+        f.write("태그\tN\tSNP\tCoverage\t정렬률\t정밀도\t재현율\n")
         for row in rows:
             f.write("\t".join(row) + "\n")
     print(f"  → {summary_path}")
