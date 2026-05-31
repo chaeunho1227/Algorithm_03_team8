@@ -8,6 +8,8 @@ from src.naive.main import run_mapping
 from src.eunho.evaluate import load_truth, load_result, evaluate
 
 # ==============================================================
+#  실험 설정
+# ==============================================================
 
 # 테스트할 genome 크기 (200_000 / 600_000 / 1_800_000)
 GENOME_SIZES = [200_000, 600_000, 1_800_000]

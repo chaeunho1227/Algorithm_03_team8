@@ -8,7 +8,7 @@ from src.eunho.main import run_mapping
 from src.eunho.evaluate import load_truth, load_result, evaluate
 
 # ==============================================================
-#  실험 설정 — 이 블록만 수정하면 됩니다
+#  실험 설정
 # ==============================================================
 
 # 테스트할 genome 크기 (200_000 / 600_000 / 1_800_000)
