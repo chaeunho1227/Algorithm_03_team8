@@ -23,6 +23,11 @@ SNP_RATES = [0.01, 0.03, 0.05]
 # 반복 서열 필터 임계값 (0 = 필터 없음)
 MAX_REPEAT = 500
 
+# SNP rate별 허용 mismatch 수
+# 고정: {0.01: 3, 0.03: 3, 0.05: 3}
+# SNP-matched: {0.01: 1, 0.03: 3, 0.05: 5}
+SNP_TO_D = {0.01: 3, 0.03: 3, 0.05: 3}
+
 # 테스트할 데이터셋
 # data_dir:    reads/reference 파일 위치
 # results_dir: 결과 저장 위치
@@ -38,10 +43,6 @@ SIZE_LABEL = {200_000: "200K", 600_000: "600K", 1_800_000: "1800K"}
 SNP_LABEL  = {0.01: "snp_1",   0.03: "snp_3",   0.05: "snp_5"}
 
 
-def reads_count(N, cov, L=100):
-    return N * cov // L
-
-
 def run_dataset(data_dir, results_dir, tag):
     results = []
 
@@ -50,10 +51,11 @@ def run_dataset(data_dir, results_dir, tag):
         ref_path = os.path.join(data_dir, size, f"reference_{size}.festa")
 
         for snp in SNP_RATES:
+            d          = SNP_TO_D[snp]
             snp_dir    = os.path.join(data_dir, size, SNP_LABEL[snp])
 
             for cov in COVERAGES:
-                m          = reads_count(N, cov)
+                m          = N * cov // 100
                 reads_path = os.path.join(snp_dir, f"reads_{m}.txt")
                 truth_path = os.path.join(snp_dir, f"truth_{m}.tsv")
 
@@ -61,7 +63,7 @@ def run_dataset(data_dir, results_dir, tag):
                 os.makedirs(out_dir, exist_ok=True)
                 result_path = os.path.join(out_dir, "result.tsv")
 
-                label = f"[{tag}] N={N//1000}K  SNP={int(snp*100)}%  {cov}x"
+                label = f"[{tag}] N={N//1000}K  SNP={int(snp*100)}%  D={d}  {cov}x"
                 print(f"[실행] {label}", flush=True)
 
                 if not os.path.exists(reads_path):
@@ -69,7 +71,7 @@ def run_dataset(data_dir, results_dir, tag):
                     continue
 
                 t0 = time.time()
-                run_mapping(ref_path, reads_path, result_path, max_repeat=MAX_REPEAT)
+                run_mapping(ref_path, reads_path, result_path, max_repeat=MAX_REPEAT, d=d)
                 elapsed = time.time() - t0
 
                 mapped, total = 0, 0

@@ -258,3 +258,5 @@ pip-selfcheck.json
 results/*
 results_naive/*
 results_random/*
+results_*/*
+docs/*

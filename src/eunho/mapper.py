@@ -8,22 +8,6 @@ from src.eunho.index_builder import hash_kmer
 
 
 def map_read(read, genome, index, k, max_mismatches):
-    """Pigeonhole Principle 기반 read mapping.
-
-    핵심 원리:
-        read에 최대 D개 mismatch가 있으면, read를 (D+1)개 segment로 나눴을 때
-        적어도 1개 segment는 reference에 완전히 일치해야 한다.
-
-    Args:
-        read: 매핑할 read 서열
-        genome: reference genome 문자열
-        index: build_index()로 만든 k-mer 인덱스
-        k: seed(segment) 길이
-        max_mismatches: 허용 mismatch 수 D
-
-    Returns:
-        list of (ref_start, mismatches)  — mismatch 오름차순 정렬
-    """
     L = len(read)
     D = max_mismatches
     n_genome = len(genome)
@@ -64,11 +48,6 @@ def map_read(read, genome, index, k, max_mismatches):
 
 
 def map_reads(reads_iter, genome, index, k, max_mismatches):
-    """reads_iter의 모든 read를 매핑하고 결과를 yield.
-
-    Yields:
-        (read_name, hits) where hits = [(ref_start, mismatches), ...]
-    """
     for read_name, read_seq in reads_iter:
         hits = map_read(read_seq, genome, index, k, max_mismatches)
         yield read_name, hits

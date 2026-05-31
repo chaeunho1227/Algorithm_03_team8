@@ -23,8 +23,8 @@ SNP_RATES = [0.01, 0.03, 0.05]
 # results_dir: 결과 저장 위치
 # tag:         결과 테이블에 표시될 이름
 DATASETS = [
-    {"data_dir": "data",        "results_dir": "results",        "tag": "chr1"},
-    {"data_dir": "data/random", "results_dir": "results_random", "tag": "random"},
+    {"data_dir": "data",        "results_dir": "results_naive",        "tag": "chr1"},
+    {"data_dir": "data/random", "results_dir": "results_naive_random", "tag": "random"},
 ]
 
 # ==============================================================
@@ -98,20 +98,18 @@ def run_dataset(data_dir, results_dir, tag):
 
 
 def main():
-    all_results = []
-
     for ds in DATASETS:
         print(f"\n{'='*70}")
         print(f"  데이터셋: {ds['tag']}  ({ds['data_dir']})")
         print(f"{'='*70}")
-        all_results += run_dataset(ds["data_dir"], ds["results_dir"], ds["tag"])
+        entries = run_dataset(ds["data_dir"], ds["results_dir"], ds["tag"])
 
-    print("\n" + "="*78)
-    print(f"{'태그':>8} {'N':>6} {'SNP':>5} {'Coverage':>8} {'정렬률':>8} {'정밀도':>8} {'재현율':>8} {'시간':>8}")
-    print("-"*78)
-    for r in all_results:
-        print(f"{r['tag']:>8} {r['N']:>6} {r['SNP']:>5} {r['cov']:>8} "
-              f"{r['정렬률']:>8} {r['정밀도']:>8} {r['재현율']:>8} {r['시간']:>8}")
+        print("\n" + "="*78)
+        print(f"{'태그':>8} {'N':>6} {'SNP':>5} {'Coverage':>8} {'정렬률':>8} {'정밀도':>8} {'재현율':>8} {'시간':>8}")
+        print("-"*78)
+        for r in entries:
+            print(f"{r['tag']:>8} {r['N']:>6} {r['SNP']:>5} {r['cov']:>8} "
+                  f"{r['정렬률']:>8} {r['정밀도']:>8} {r['재현율']:>8} {r['시간']:>8}")
 
 
 if __name__ == "__main__":
