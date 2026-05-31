@@ -256,3 +256,4 @@ pip-selfcheck.json
 ### Project Data ###
 /data/*
 results/*
+results_naive/*
