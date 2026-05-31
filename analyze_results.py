@@ -10,6 +10,7 @@ def analyze(results_dir):
     print(f"{'Config':<32} {'Align':>7} {'Prec':>7} {'Recall':>7}")
     print("-" * 55)
 
+    rows = []
     for subdir in sorted(os.listdir(results_dir)):
         m = PATTERN.match(subdir)
         result_path = os.path.join(results_dir, subdir, "result.tsv")
@@ -43,10 +44,19 @@ def analyze(results_dir):
                     p = line.rstrip().split("\t")
                     if p[1] != "*" and truth.get(p[0]) == int(p[2]):
                         correct += 1
-            prec = f"{correct/mapped*100:.1f}%" if mapped else "N/A"
-            rec  = f"{correct/len(truth)*100:.1f}%"
+            prec = f"{correct/mapped*100:.1f}" if mapped else "N/A"
+            rec  = f"{correct/len(truth)*100:.1f}"
 
-        print(f"{subdir:<32} {mapped/total*100:>6.1f}% {prec:>7} {rec:>7}")
+        align = f"{mapped/total*100:.1f}"
+        print(f"{subdir:<32} {align:>6}% {prec+('%' if prec != 'N/A' else ''):>7} {rec+('%' if rec != 'N/A' else ''):>7}")
+        rows.append((subdir, align, prec, rec))
+
+    summary_path = os.path.join(results_dir, "summary.tsv")
+    with open(summary_path, "w") as f:
+        f.write("Config\tAlignRate\tPrecision\tRecall\n")
+        for row in rows:
+            f.write("\t".join(row) + "\n")
+    print(f"  → {summary_path}")
 
 dirs = sys.argv[1:] or [d for d in sorted(os.listdir(".")) if d.startswith("results") and os.path.isdir(d)]
 for d in dirs:
