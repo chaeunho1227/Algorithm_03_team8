@@ -51,17 +51,17 @@ def analyze(results_dir):
     entries.sort(key=lambda x: (x[0], x[1], x[2]))
 
     print(f"\n{'='*78}")
-    print(f"{'태그':>8} {'N':>6} {'SNP':>5} {'Coverage':>8} {'정렬률':>8} {'정밀도':>8} {'재현율':>8}")
+    print(f"{'tag':>8} {'N':>6} {'SNP':>5} {'Coverage':>8} {'AlignRate':>10} {'Precision':>10} {'Recall':>8}")
     print("-" * 78)
 
     rows = []
     for _, _, _, t, size, snp_pct, cov_lbl, align, prec, rec in entries:
-        print(f"{t:>8} {size:>6} {snp_pct:>5} {cov_lbl:>8} {align:>8} {prec:>8} {rec:>8}")
+        print(f"{t:>8} {size:>6} {snp_pct:>5} {cov_lbl:>8} {align:>10} {prec:>10} {rec:>8}")
         rows.append((t, size, snp_pct, cov_lbl, align, prec, rec))
 
     summary_path = os.path.join(results_dir, "summary.tsv")
     with open(summary_path, "w") as f:
-        f.write("태그\tN\tSNP\tCoverage\t정렬률\t정밀도\t재현율\n")
+        f.write("tag\tN\tSNP\tCoverage\tAlignRate\tPrecision\tRecall\n")
         for row in rows:
             f.write("\t".join(row) + "\n")
     print(f"  → {summary_path}")
