@@ -12,7 +12,7 @@ D          = 3
 MAX_REPEAT = 0
 
 
-def run_mapping(ref_path, reads_path, output_path):
+def run_mapping(ref_path, reads_path, output_path, d=D):
     # 1. Reference genome 로드
     print(f"[1/4] Reference genome 로드 중: {ref_path}")
     t0 = time.time()
@@ -27,8 +27,8 @@ def run_mapping(ref_path, reads_path, output_path):
         print("오류: reads 파일이 비어 있습니다.")
         sys.exit(1)
     L = len(reads[0][1])
-    k = L // (D + 1)
-    print(f"  seed 길이: L={L}, D={D} → k={k}")
+    k = L // (d + 1)
+    print(f"  seed 길이: L={L}, D={d} → k={k}")
 
     print(f"[2/4] k-mer 인덱스 빌드 중 (k={k}, MAX_REPEAT 필터 없음)")
     t1 = time.time()
@@ -36,13 +36,13 @@ def run_mapping(ref_path, reads_path, output_path):
     print(f"  인덱스 완료: {len(index):,} 고유 k-mer  ({time.time()-t1:.2f}s)")
 
     # 3. Read 매핑 (최적화 없음)
-    print(f"[3/4] Read 매핑 중 (D={D})")
+    print(f"[3/4] Read 매핑 중 (D={d})")
     t2 = time.time()
     results = []
     mapped = 0
     total = 0
 
-    for read_name, hits in map_reads(reads, genome, index, k, D):
+    for read_name, hits in map_reads(reads, genome, index, k, d):
         total += 1
         if hits:
             mapped += 1

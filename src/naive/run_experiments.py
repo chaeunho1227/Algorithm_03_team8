@@ -20,6 +20,11 @@ COVERAGES = [10, 20]
 # 테스트할 SNP rate (0.01 / 0.03 / 0.05)
 SNP_RATES = [0.01, 0.03, 0.05]
 
+# SNP rate별 허용 mismatch 수
+# 고정: {0.01: 3, 0.03: 3, 0.05: 3}
+# SNP-matched: {0.01: 1, 0.03: 3, 0.05: 5}
+SNP_TO_D = {0.01: 3, 0.03: 3, 0.05: 3}
+
 # 테스트할 데이터셋
 # data_dir:    reads/reference 파일 위치
 # results_dir: 결과 저장 위치
@@ -47,6 +52,7 @@ def run_dataset(data_dir, results_dir, tag):
         ref_path = os.path.join(data_dir, size, f"reference_{size}.festa")
 
         for snp in SNP_RATES:
+            d          = SNP_TO_D[snp]
             snp_dir    = os.path.join(data_dir, size, SNP_LABEL[snp])
 
             for cov in COVERAGES:
@@ -66,7 +72,7 @@ def run_dataset(data_dir, results_dir, tag):
                     continue
 
                 t0 = time.time()
-                run_mapping(ref_path, reads_path, result_path)
+                run_mapping(ref_path, reads_path, result_path, d=d)
                 elapsed = time.time() - t0
 
                 mapped, total = 0, 0
