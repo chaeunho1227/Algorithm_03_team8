@@ -33,21 +33,28 @@ SNP_VALUES = [("snp_1", 0.01), ("snp_3", 0.03), ("snp_5", 0.05)]
 
 
 def compute_depth(result_path, L_, N_):
+    """매핑 결과로부터 reference 위치별 커버리지 깊이(depth)를 계산.
+
+    각 매핑된 read가 덮는 [pos, pos+L) 구간의 모든 위치 카운트를 1씩 올린다.
+    depth[i] == 0 이면 그 위치를 덮는 read가 하나도 없다는 뜻 → 복원 불가.
+
+    Returns: position -> depth 딕셔너리 (커버된 위치만 보관).
+    """
     depth = defaultdict(int)
     with open(result_path) as f:
-        next(f)
+        next(f)  # header
         for line in f:
             parts = line.rstrip().split("\t")
             if len(parts) < 4:
                 continue
             chrom = parts[1]
-            if chrom == "*":
+            if chrom == "*":  # 매핑 실패한 read는 제외
                 continue
             try:
                 pos = int(parts[2])
             except ValueError:
                 continue
-            if pos < 0 or pos + L_ > N_:
+            if pos < 0 or pos + L_ > N_:  # 게놈 범위를 벗어나는 매핑은 제외
                 continue
             for j in range(L_):
                 depth[pos + j] += 1
@@ -55,6 +62,7 @@ def compute_depth(result_path, L_, N_):
 
 
 def main():
+    """SNP × D 조합별 정확도를 매핑→측정→저장하는 전체 파이프라인."""
     ref_path = os.path.join(DATA_DIR, N_LABEL, f"reference_{N_LABEL}.festa")
     reference = next(iter(parse_fasta(ref_path).values()))
     N = len(reference)
@@ -65,11 +73,13 @@ def main():
     for snp_lbl, snp_rate in SNP_VALUES:
         sample_path = os.path.join(DATA_DIR, N_LABEL, snp_lbl, "sample.festa")
         sample = next(iter(parse_fasta(sample_path).values()))
+        # 실제 SNP 위치 = reference와 sample 염기가 다른 위치
         truth_snps = {i for i in range(N) if reference[i] != sample[i]}
         n_truth = len(truth_snps)
         reads_path = os.path.join(DATA_DIR, N_LABEL, snp_lbl, f"reads_{M}.txt")
         print(f"\n=== SNP {int(snp_rate*100)}% (truth SNPs = {n_truth:,}) ===")
 
+        # D(허용 mismatch)를 1→9로 키워가며 정확도가 회복되는 곡선을 측정한다.
         results[snp_rate] = {}
         for D in D_VALUES:
             result_path = os.path.join(TMP_DIR, f"{snp_lbl}_D{D}.tsv")
@@ -78,8 +88,11 @@ def main():
             t_map = time.time() - t0
 
             depth = compute_depth(result_path, L, N)
+            # SNP 위치를 덮는 read가 하나도 없으면(depth 0) 그 변이는 복원할 수 없다.
             uncovered = sum(1 for s in truth_snps if depth.get(s, 0) == 0)
+            # 정확도   = 복원 가능한(=커버된) 전체 게놈 비율
             accuracy = (N - uncovered) / N * 100
+            # SNP recall = 커버되어 탐지 가능한 SNP 비율
             snp_recall = (n_truth - uncovered) / n_truth * 100
             results[snp_rate][D] = (accuracy, snp_recall)
             print(f"  D={D}: 정확도={accuracy:.4f}%  SNP recall={snp_recall:.2f}%  (map {t_map:.2f}s)")

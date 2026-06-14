@@ -67,14 +67,6 @@ def restore_genome(reference, result_path, reads):
     return "".join(restored)
 
 
-def restoration_accuracy(reference, sample, result_path, reads):
-    """복원정확도 = 일치 염기 수 / 전체 염기 수."""
-    restored = restore_genome(reference, result_path, reads)
-    N = min(len(restored), len(sample))
-    match = sum(1 for i in range(N) if restored[i] == sample[i])
-    return match / N if N else 0.0
-
-
 def restoration_and_snp_recall(reference, sample, result_path, reads):
     """복원정확도와 SNP 재현율을 한 번의 복원으로 동시 계산.
 
@@ -104,8 +96,3 @@ def restoration_and_snp_recall(reference, sample, result_path, reads):
     acc = match / N if N else 0.0
     recall = detected_snp / truth_snp if truth_snp else 0.0
     return acc, recall
-
-
-def snp_recall(reference, sample, result_path, reads):
-    """SNP 재현율 = 탐지된 SNP 위치 수 / 실제 SNP 위치 수."""
-    return restoration_and_snp_recall(reference, sample, result_path, reads)[1]
